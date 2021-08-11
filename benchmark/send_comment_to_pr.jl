@@ -119,7 +119,7 @@ function main()
 
   if gist_file == DEFAULT_GIST_FILE_PATH
       comment = "$(comment): $(create_gist_from_json_file(myauth).html_url)"
-  else
+  elseif !isempty(gist_file)
       comment = "$(comment): $(create_gist_from_log_file(gist_file, myauth).html_url)"
   end
   post_comment_to_pr(org, repo_name, pullrequest_id, comment; auth = myauth)
