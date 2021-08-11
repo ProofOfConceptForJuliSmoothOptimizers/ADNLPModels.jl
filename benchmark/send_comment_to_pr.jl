@@ -27,12 +27,13 @@ function parse_commandline()
     arg_type = Int
     "--gist", "-g"
     help = "specify this argument if you want to send a gist to the pullrequest. If this option is not specified, you must specify a comment"
-    action = :store_true
-
+    arg_type = String
+    required = false
+    default = DEFAULT_GIST_FILE_PATH
     "--comment", "-c"
     help = "Comment to post on the pull request"
     arg_type = String
-    required = false
+    required = true
   end
 
   return parse_args(s, as_symbols = true)
@@ -46,6 +47,24 @@ function create_gist_from_json_file(myauth)
     end
   end
   posted_gist = create_gist(params = gist, auth = myauth)
+  return posted_gist
+end
+
+function create_gist_from_log_file(gist_file, myauth)
+  file_content = ""
+  file = open(gist_file, "r")
+  for line in readlines(file)
+      file_content *= line*'\n'
+  end
+  close(file)
+
+  file_dict = Dict(gist_file => Dict("content" => file_content))
+  gist = Dict{String,Any}("description" => "Benchmark logs",
+                            "public" => true,
+                            "files" => file_dict)
+
+  posted_gist = GitHub.create_gist(params = gist, auth = myauth)
+
   return posted_gist
 end
 
@@ -95,11 +114,14 @@ function main()
   org = parsed_args[:org]
   repo_name = parsed_args[:repo]
   pullrequest_id = parsed_args[:pullrequest]
-  gist_flag = parsed_args[:gist]
-  comment =
-    gist_flag ?
-    "The gist of the benchmarks can be found here: $(create_gist_from_json_file(myauth).html_url)" :
-    parsed_args[:comment]
+  gist_file = parsed_args[:gist]
+  comment = parsed_args[:comment]
+
+  if gist_file == DEFAULT_GIST_FILE_PATH
+      comment = "$(comment): $(create_gist_from_json_file(myauth).html_url)"
+  else
+      comment = "$(comment): $(create_gist_from_log_file(gist_file, myauth).html_url)"
+  end
   post_comment_to_pr(org, repo_name, pullrequest_id, comment; auth = myauth)
 end
 
