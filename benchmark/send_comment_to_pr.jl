@@ -8,7 +8,7 @@ using Git
 using GitHub
 using JSON
 
-DEFAULT_GIST_FILE_PATH = "./gist.json"
+DEFAULT_GIST_FILE_PATH = "gist.json"
 
 function parse_commandline()
   s = ArgParseSettings()
