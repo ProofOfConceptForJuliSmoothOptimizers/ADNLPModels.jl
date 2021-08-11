@@ -29,7 +29,6 @@ function parse_commandline()
     help = "specify this argument if you want to send a gist to the pullrequest. If this option is not specified, you must specify a comment"
     arg_type = String
     required = false
-    default = DEFAULT_GIST_FILE_PATH
     "--comment", "-c"
     help = "Comment to post on the pull request"
     arg_type = String
@@ -119,7 +118,7 @@ function main()
 
   if gist_file == DEFAULT_GIST_FILE_PATH
       comment = "$(comment): $(create_gist_from_json_file(myauth).html_url)"
-  elseif !isempty(gist_file)
+  elseif !isnothing(gist_file)
       comment = "$(comment): $(create_gist_from_log_file(gist_file, myauth).html_url)"
   end
   post_comment_to_pr(org, repo_name, pullrequest_id, comment; auth = myauth)
