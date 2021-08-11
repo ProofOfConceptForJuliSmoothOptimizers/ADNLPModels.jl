@@ -108,6 +108,7 @@ pipeline {
       sh '''
       git clean -fd
       git checkout main
+      rm -f /home/jenkins/benchmarks/$org/$repo/${pullrequest}_bmark_*
       '''
       }
     }
