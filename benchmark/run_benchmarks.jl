@@ -22,6 +22,9 @@ using Plots
 
 using SolverBenchmark
 
+# testing if the error logs will be shown in a gist
+die()
+
 # NB: benchmarkpkg will run benchmarks/benchmarks.jl by default
 commit = benchmarkpkg(repo_name)  # current state of repository
 main = benchmarkpkg(repo_name, "main")
