@@ -52,7 +52,10 @@ end
 function create_gist_from_log_file(gist_file, pullrequest_id, myauth)
   file_content = ""
   file = open(gist_file, "r")
-  for line in readlines(file)
+  # this end -300 is just to take the last 300 lines as the file is quite huge
+  file_lines = readlines(file)
+  lines = length(file_lines) >= 300 ? file_lines[end-299:end] : file_lines
+  for line in lines
       file_content *= line*'\n'
   end
   close(file)
@@ -115,7 +118,6 @@ function main()
   pullrequest_id = parsed_args[:pullrequest]
   gist_file = parsed_args[:gist]
   comment = parsed_args[:comment]
-
 
   if !isnothing(gist_file) 
       if gist_file == DEFAULT_GIST_FILE_PATH
