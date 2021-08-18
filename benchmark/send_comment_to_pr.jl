@@ -49,7 +49,7 @@ function create_gist_from_json_file(myauth)
   return posted_gist
 end
 
-function create_gist_from_log_file(gist_file, myauth)
+function create_gist_from_log_file(gist_file, pullrequest_id, myauth)
   file_content = ""
   file = open(gist_file, "r")
   for line in readlines(file)
@@ -57,7 +57,7 @@ function create_gist_from_log_file(gist_file, myauth)
   end
   close(file)
 
-  file_dict = Dict(gist_file => Dict("content" => file_content))
+  file_dict = Dict("$(pullrequest_id)_bmark_error.log" => Dict("content" => file_content))
   gist = Dict{String,Any}("description" => "Benchmark logs",
                             "public" => true,
                             "files" => file_dict)
@@ -116,10 +116,13 @@ function main()
   gist_file = parsed_args[:gist]
   comment = parsed_args[:comment]
 
-  if gist_file == DEFAULT_GIST_FILE_PATH
-      comment = "$(comment): $(create_gist_from_json_file(myauth).html_url)"
-  elseif !isnothing(gist_file)
-      comment = "$(comment): $(create_gist_from_log_file(gist_file, myauth).html_url)"
+
+  if !isnothing(gist_file) 
+      if gist_file == DEFAULT_GIST_FILE_PATH
+        comment = "$(comment): $(create_gist_from_json_file(myauth).html_url)"
+      else
+        comment = "$(comment): $(create_gist_from_log_file(gist_file, pullrequest_id, myauth).html_url)"
+      end
   end
   post_comment_to_pr(org, repo_name, pullrequest_id, comment; auth = myauth)
 end
